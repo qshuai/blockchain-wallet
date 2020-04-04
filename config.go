@@ -65,12 +65,10 @@ type Config struct {
 }
 
 func NewDefaultConfig() *Config {
-	dataDir := btcutil.AppDataDir(appName, false)
-
 	return &Config{
 		Params:    &chaincfg.MainNetParams,
 		UserAgent: appName,
-		DataDir:   dataDir,
+		DataDir:   btcutil.AppDataDir(appName, false),
 		LowFee:    140,
 		MediumFee: 160,
 		HighFee:   180,

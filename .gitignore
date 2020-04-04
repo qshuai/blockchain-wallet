@@ -2,7 +2,6 @@
 *.o
 *.a
 *.so
-spvwallet
 
 # Folders
 _obj
