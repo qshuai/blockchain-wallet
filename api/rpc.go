@@ -1,8 +1,12 @@
 package api
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
+	"net"
+	"sync"
+
 	"github.com/OpenBazaar/spvwallet"
 	"github.com/OpenBazaar/spvwallet/api/pb"
 	"github.com/OpenBazaar/wallet-interface"
@@ -12,11 +16,8 @@ import (
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"net"
-	"sync"
 )
 
 const Addr = "127.0.0.1:8234"

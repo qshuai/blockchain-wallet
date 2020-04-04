@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"testing"
+	"time"
+
 	"github.com/OpenBazaar/wallet-interface"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil/hdkeychain"
-	"testing"
-	"time"
 )
 
 var zeroHash chainhash.Hash

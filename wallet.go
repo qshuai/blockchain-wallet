@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/OpenBazaar/spvwallet/exchangerates"
 	"github.com/OpenBazaar/wallet-interface"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -14,20 +15,18 @@ import (
 	"github.com/btcsuite/btcd/peer"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
-	btc "github.com/btcsuite/btcutil"
-	hd "github.com/btcsuite/btcutil/hdkeychain"
+	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
 	"github.com/op/go-logging"
-	b39 "github.com/tyler-smith/go-bip39"
-
-	"github.com/OpenBazaar/spvwallet/exchangerates"
+	"github.com/tyler-smith/go-bip39"
 )
 
 type SPVWallet struct {
 	params *chaincfg.Params
 
-	masterPrivateKey *hd.ExtendedKey
-	masterPublicKey  *hd.ExtendedKey
+	masterPrivateKey *hdkeychain.ExtendedKey
+	masterPublicKey  *hdkeychain.ExtendedKey
 
 	mnemonic string
 
@@ -65,20 +64,20 @@ func NewSPVWallet(config *Config) (*SPVWallet, error) {
 	log.SetBackend(logging.AddModuleLevel(config.Logger))
 
 	if config.Mnemonic == "" {
-		ent, err := b39.NewEntropy(128)
+		ent, err := bip39.NewEntropy(128)
 		if err != nil {
 			return nil, err
 		}
-		mnemonic, err := b39.NewMnemonic(ent)
+		mnemonic, err := bip39.NewMnemonic(ent)
 		if err != nil {
 			return nil, err
 		}
 		config.Mnemonic = mnemonic
 		config.CreationDate = time.Now()
 	}
-	seed := b39.NewSeed(config.Mnemonic, "")
+	seed := bip39.NewSeed(config.Mnemonic, "")
 
-	mPrivKey, err := hd.NewMaster(seed, config.Params)
+	mPrivKey, err := hdkeychain.NewMaster(seed, config.Params)
 	if err != nil {
 		return nil, err
 	}
@@ -190,18 +189,18 @@ func (w *SPVWallet) CurrencyCode() string {
 }
 
 func (w *SPVWallet) IsDust(amount int64) bool {
-	return txrules.IsDustAmount(btc.Amount(amount), 25, txrules.DefaultRelayFeePerKb)
+	return txrules.IsDustAmount(btcutil.Amount(amount), 25, txrules.DefaultRelayFeePerKb)
 }
 
-func (w *SPVWallet) MasterPrivateKey() *hd.ExtendedKey {
+func (w *SPVWallet) MasterPrivateKey() *hdkeychain.ExtendedKey {
 	return w.masterPrivateKey
 }
 
-func (w *SPVWallet) MasterPublicKey() *hd.ExtendedKey {
+func (w *SPVWallet) MasterPublicKey() *hdkeychain.ExtendedKey {
 	return w.masterPublicKey
 }
 
-func (w *SPVWallet) ChildKey(keyBytes []byte, chaincode []byte, isPrivateKey bool) (*hd.ExtendedKey, error) {
+func (w *SPVWallet) ChildKey(keyBytes []byte, chaincode []byte, isPrivateKey bool) (*hdkeychain.ExtendedKey, error) {
 	parentFP := []byte{0x00, 0x00, 0x00, 0x00}
 	var id []byte
 	if isPrivateKey {
@@ -209,7 +208,7 @@ func (w *SPVWallet) ChildKey(keyBytes []byte, chaincode []byte, isPrivateKey boo
 	} else {
 		id = w.params.HDPublicKeyID[:]
 	}
-	hdKey := hd.NewExtendedKey(
+	hdKey := hdkeychain.NewExtendedKey(
 		id,
 		keyBytes,
 		chaincode,
@@ -228,45 +227,45 @@ func (w *SPVWallet) ConnectedPeers() []*peer.Peer {
 	return w.peerManager.ConnectedPeers()
 }
 
-func (w *SPVWallet) CurrentAddress(purpose wallet.KeyPurpose) btc.Address {
+func (w *SPVWallet) CurrentAddress(purpose wallet.KeyPurpose) btcutil.Address {
 	key, _ := w.keyManager.GetCurrentKey(purpose)
 	addr, _ := key.Address(w.params)
-	return btc.Address(addr)
+	return btcutil.Address(addr)
 }
 
-func (w *SPVWallet) NewAddress(purpose wallet.KeyPurpose) btc.Address {
+func (w *SPVWallet) NewAddress(purpose wallet.KeyPurpose) btcutil.Address {
 	i, _ := w.txstore.Keys().GetUnused(purpose)
 	key, _ := w.keyManager.generateChildKey(purpose, uint32(i[1]))
 	addr, _ := key.Address(w.params)
 	w.txstore.Keys().MarkKeyAsUsed(addr.ScriptAddress())
 	w.txstore.PopulateAdrs()
-	return btc.Address(addr)
+	return btcutil.Address(addr)
 }
 
-func (w *SPVWallet) DecodeAddress(addr string) (btc.Address, error) {
-	return btc.DecodeAddress(addr, w.params)
+func (w *SPVWallet) DecodeAddress(addr string) (btcutil.Address, error) {
+	return btcutil.DecodeAddress(addr, w.params)
 }
 
-func (w *SPVWallet) ScriptToAddress(script []byte) (btc.Address, error) {
+func (w *SPVWallet) ScriptToAddress(script []byte) (btcutil.Address, error) {
 	return scriptToAddress(script, w.params)
 }
 
-func scriptToAddress(script []byte, params *chaincfg.Params) (btc.Address, error) {
+func scriptToAddress(script []byte, params *chaincfg.Params) (btcutil.Address, error) {
 	_, addrs, _, err := txscript.ExtractPkScriptAddrs(script, params)
 	if err != nil {
-		return &btc.AddressPubKeyHash{}, err
+		return &btcutil.AddressPubKeyHash{}, err
 	}
 	if len(addrs) == 0 {
-		return &btc.AddressPubKeyHash{}, errors.New("unknown script")
+		return &btcutil.AddressPubKeyHash{}, errors.New("unknown script")
 	}
 	return addrs[0], nil
 }
 
-func (w *SPVWallet) AddressToScript(addr btc.Address) ([]byte, error) {
+func (w *SPVWallet) AddressToScript(addr btcutil.Address) ([]byte, error) {
 	return txscript.PayToAddrScript(addr)
 }
 
-func (w *SPVWallet) HasKey(addr btc.Address) bool {
+func (w *SPVWallet) HasKey(addr btcutil.Address) bool {
 	_, err := w.keyManager.GetKeyForScript(addr.ScriptAddress())
 	if err != nil {
 		return false
@@ -274,7 +273,7 @@ func (w *SPVWallet) HasKey(addr btc.Address) bool {
 	return true
 }
 
-func (w *SPVWallet) GetKey(addr btc.Address) (*btcec.PrivateKey, error) {
+func (w *SPVWallet) GetKey(addr btcutil.Address) (*btcec.PrivateKey, error) {
 	key, err := w.keyManager.GetKeyForScript(addr.ScriptAddress())
 	if err != nil {
 		return nil, err
@@ -282,9 +281,9 @@ func (w *SPVWallet) GetKey(addr btc.Address) (*btcec.PrivateKey, error) {
 	return key.ECPrivKey()
 }
 
-func (w *SPVWallet) ListAddresses() []btc.Address {
+func (w *SPVWallet) ListAddresses() []btcutil.Address {
 	keys := w.keyManager.GetKeys()
-	addrs := []btc.Address{}
+	addrs := []btcutil.Address{}
 	for _, k := range keys {
 		addr, err := k.Address(w.params)
 		if err != nil {
@@ -372,7 +371,7 @@ func (w *SPVWallet) GetTransaction(txid chainhash.Hash) (wallet.Txn, error) {
 		}
 		outs := []wallet.TransactionOutput{}
 		for i, out := range tx.TxOut {
-			var addr btc.Address
+			var addr btcutil.Address
 			_, addrs, _, err := txscript.ExtractPkScriptAddrs(out.PkScript, w.params)
 			if err != nil {
 				log.Warningf("error extracting address from txn pkscript: %v\n", err)
@@ -444,7 +443,7 @@ func (w *SPVWallet) ChainTip() (uint32, chainhash.Hash) {
 	return sh.height, sh.header.BlockHash()
 }
 
-func (w *SPVWallet) AddWatchedAddresses(addrs ...btc.Address) error {
+func (w *SPVWallet) AddWatchedAddresses(addrs ...btcutil.Address) error {
 
 	var err error
 	var watchedScripts [][]byte

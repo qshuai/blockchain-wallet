@@ -2,6 +2,7 @@
 *.o
 *.a
 *.so
+spvwallet
 
 # Folders
 _obj
@@ -25,3 +26,6 @@ _testmain.go
 .idea/
 *.iml
 .gx/
+
+# dependencies
+vendor
