@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/asticode/go-astilog"
 	"github.com/asticode/go-astitools/template"
 	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
 )
 
 // Vars
@@ -35,14 +35,14 @@ func serve(baseDirectoryPath string, fnR AdaptRouter, fnT TemplateData) (ln net.
 	// Parse templates
 	var err error
 	if templates, err = astitemplate.ParseDirectory(filepath.Join(baseDirectoryPath, "resources", "templates"), ".html"); err != nil {
-		astilog.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	// Listen
 	if ln, err = net.Listen("tcp", "127.0.0.1:"); err != nil {
-		astilog.Fatal(err)
+		logrus.Fatal(err)
 	}
-	astilog.Debugf("Listening on %s", ln.Addr())
+	logrus.Debugf("Listening on %s", ln.Addr())
 
 	// Serve
 	go http.Serve(ln, r)
@@ -64,7 +64,7 @@ func handleTemplates(fn TemplateData) httprouter.Handle {
 		var err error
 		if fn != nil {
 			if d, err = fn(name, r, p); err != nil {
-				astilog.Errorf("%s while retrieving data for template %s", err, name)
+				logrus.Errorf("%s while retrieving data for template %s", err, name)
 				rw.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -72,7 +72,7 @@ func handleTemplates(fn TemplateData) httprouter.Handle {
 
 		// Execute template
 		if err = templates.ExecuteTemplate(rw, name, d); err != nil {
-			astilog.Errorf("%s while handling template %s", err, name)
+			logrus.Errorf("%s while handling template %s", err, name)
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}

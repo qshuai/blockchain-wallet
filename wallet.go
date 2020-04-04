@@ -17,8 +17,8 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
-	"github.com/op/go-logging"
 	"github.com/qshuai/blockchain-wallet/exchangerates"
+	log "github.com/sirupsen/logrus"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -55,13 +55,9 @@ type SPVWallet struct {
 
 var _ = wallet.Wallet(&SPVWallet{})
 
-var log = logging.MustGetLogger("bitcoin")
-
 const WalletVersion = "0.1.0"
 
 func NewSPVWallet(config *Config) (*SPVWallet, error) {
-
-	log.SetBackend(logging.AddModuleLevel(config.Logger))
 
 	if config.Mnemonic == "" {
 		ent, err := bip39.NewEntropy(128)
@@ -86,7 +82,7 @@ func NewSPVWallet(config *Config) (*SPVWallet, error) {
 		return nil, err
 	}
 	w := &SPVWallet{
-		repoPath:         config.RepoPath,
+		repoPath:         config.DataDir,
 		masterPrivateKey: mPrivKey,
 		masterPublicKey:  mPubKey,
 		mnemonic:         config.Mnemonic,
@@ -150,7 +146,7 @@ func NewSPVWallet(config *Config) (*SPVWallet, error) {
 		UserAgentName:    config.UserAgent,
 		UserAgentVersion: WalletVersion,
 		Params:           w.params,
-		AddressCacheDir:  config.RepoPath,
+		AddressCacheDir:  config.DataDir,
 		Proxy:            config.Proxy,
 		GetNewestBlock:   getNewestBlock,
 		MsgChan:          ws.MsgChan(),

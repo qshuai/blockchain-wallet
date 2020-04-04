@@ -29,18 +29,38 @@ func main() {
 
 	if len(os.Args) == 1 {
 		start.Gui = true
-		start.Execute([]string{"defaultSettings"})
+		err := start.Execute([]string{"defaultSettings"})
+		if err != nil {
+			fmt.Printf("spvwallet start failed: %s\n", err)
+			os.Exit(1)
+		}
 	} else {
-		parser.AddCommand("start",
+		_, err := parser.AddCommand("start",
 			"start the wallet",
 			"The start command starts the wallet daemon",
 			&start)
-		parser.AddCommand("version",
+		if err != nil {
+			fmt.Printf("spvwallet add start command failed: %s\n", err)
+			os.Exit(1)
+		}
+
+		_, err = parser.AddCommand("version",
 			"print the version number",
 			"Print the version number and exit",
 			&version)
-		cli.SetupCli(parser)
-		if _, err := parser.Parse(); err != nil {
+		if err != nil {
+			fmt.Printf("spvwallet add version command failed: %s\n", err)
+			os.Exit(1)
+		}
+
+		err = cli.SetupCli(parser)
+		if err != nil {
+			fmt.Printf("spvwallet add commands failed: %s\n", err)
+			os.Exit(1)
+		}
+
+		if _, err = parser.Parse(); err != nil {
+			fmt.Printf("spvwallet parse flag failed: %s\n", err)
 			os.Exit(1)
 		}
 	}

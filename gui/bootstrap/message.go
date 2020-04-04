@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/asticode/go-astilectron"
-	"github.com/asticode/go-astilog"
+	"github.com/sirupsen/logrus"
 )
 
 // MessageOut represents a message going out
@@ -26,7 +26,7 @@ func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astile
 		var m MessageIn
 		var err error
 		if err = e.Unmarshal(&m); err != nil {
-			astilog.Errorf("Unmarshaling message %+v failed", *e)
+			logrus.Errorf("Unmarshaling message %+v failed", *e)
 			return
 		}
 

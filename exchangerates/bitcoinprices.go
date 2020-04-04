@@ -11,13 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/op/go-logging"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/proxy"
 )
 
 const SatoshiPerBTC = 100000000
-
-var log = logging.MustGetLogger("exchangeRates")
 
 type ExchangeRateProvider struct {
 	fetchUrl string
@@ -116,7 +114,7 @@ func (b *BitcoinPriceFetcher) fetchCurrentRates() error {
 			return nil
 		}
 	}
-	log.Error("Failed to fetch bitcoin exchange rates")
+	logrus.Error("Failed to fetch bitcoin exchange rates")
 	return errors.New("All exchange rate API queries failed")
 }
 
@@ -127,14 +125,14 @@ func (provider *ExchangeRateProvider) fetch() (err error) {
 	}
 	resp, err := provider.client.Get(provider.fetchUrl)
 	if err != nil {
-		log.Error("Failed to fetch from "+provider.fetchUrl, err)
+		logrus.Error("Failed to fetch from "+provider.fetchUrl, err)
 		return err
 	}
 	decoder := json.NewDecoder(resp.Body)
 	var dataMap interface{}
 	err = decoder.Decode(&dataMap)
 	if err != nil {
-		log.Error("Failed to decode JSON from "+provider.fetchUrl, err)
+		logrus.Error("Failed to decode JSON from "+provider.fetchUrl, err)
 		return err
 	}
 	return provider.decoder.decode(dataMap, provider.cache)

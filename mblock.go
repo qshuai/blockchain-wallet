@@ -6,6 +6,7 @@ import (
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
+	log "github.com/sirupsen/logrus"
 )
 
 func MakeMerkleParent(left *chainhash.Hash, right *chainhash.Hash) (*chainhash.Hash, error) {

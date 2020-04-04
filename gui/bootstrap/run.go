@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 
 	"github.com/asticode/go-astilectron"
-	"github.com/asticode/go-astilog"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func Asset(src string) ([]byte, error) {
@@ -125,10 +125,10 @@ func Run(o Options) (err error) {
 
 				// Create the menu
 				if err = m.Create(); err != nil {
-					astilog.Fatal(errors.Wrap(err, "creating tray menu failed"))
+					logrus.Fatal(errors.Wrap(err, "creating tray menu failed"))
 				}
 				if err = t.Create(); err != nil {
-					astilog.Fatal(errors.Wrap(err, "creating tray failed"))
+					logrus.Fatal(errors.Wrap(err, "creating tray failed"))
 				}
 			}
 		}()

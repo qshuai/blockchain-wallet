@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/op/go-logging"
 	spvwallet "github.com/qshuai/blockchain-wallet"
 	"github.com/qshuai/blockchain-wallet/db"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -15,16 +15,15 @@ func main() {
 	config := spvwallet.NewDefaultConfig()
 
 	// Make the logging a little prettier
-	backend := logging.NewLogBackend(os.Stdout, "", 0)
-	formatter := logging.MustStringFormatter(`%{color:reset}%{color}%{time:15:04:05.000} [%{shortfunc}] [%{level}] %{message}`)
-	stdoutFormatter := logging.NewBackendFormatter(backend, formatter)
-	config.Logger = logging.MultiLogger(stdoutFormatter)
+	config.Logger = logrus.Logger{
+		Out: os.Stdout,
+	}
 
 	// Use testnet
 	config.Params = &chaincfg.TestNet3Params
 
 	// Select wallet datastore
-	sqliteDatastore, _ := db.Create(config.RepoPath)
+	sqliteDatastore, _ := db.Create(config.DataDir)
 	config.DB = sqliteDatastore
 
 	// Create the wallet

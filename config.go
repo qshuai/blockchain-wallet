@@ -4,15 +4,17 @@ import (
 	"net"
 	"net/url"
 	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/OpenBazaar/wallet-interface"
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/mitchellh/go-homedir"
-	"github.com/op/go-logging"
+	"github.com/btcsuite/btcutil"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/proxy"
+)
+
+const (
+	appName = "spvwallet"
 )
 
 type Config struct {
@@ -30,7 +32,7 @@ type Config struct {
 	UserAgent string
 
 	// Location of the data directory
-	RepoPath string
+	DataDir string
 
 	// An implementation of the Datastore interface
 	DB wallet.Datastore
@@ -56,51 +58,26 @@ type Config struct {
 	FeeAPI url.URL
 
 	// A logger. You can write the logs to file or stdout or however else you want.
-	Logger logging.Backend
+	Logger logrus.Logger
 
 	// Disable the exchange rate provider
 	DisableExchangeRates bool
 }
 
 func NewDefaultConfig() *Config {
-	repoPath, _ := getRepoPath()
-	_, ferr := os.Stat(repoPath)
-	if os.IsNotExist(ferr) {
-		os.Mkdir(repoPath, os.ModePerm)
-	}
-	feeApi, _ := url.Parse("https://bitcoinfees.21.co/api/v1/fees/recommended")
+	dataDir := btcutil.AppDataDir(appName, false)
+
 	return &Config{
 		Params:    &chaincfg.MainNetParams,
-		UserAgent: "spvwallet",
-		RepoPath:  repoPath,
+		UserAgent: appName,
+		DataDir:   dataDir,
 		LowFee:    140,
 		MediumFee: 160,
 		HighFee:   180,
 		MaxFee:    2000,
-		FeeAPI:    *feeApi,
-		Logger:    logging.NewLogBackend(os.Stdout, "", 0),
+		//FeeAPI:    *feeApi,
+		Logger: logrus.Logger{
+			Out: os.Stdout,
+		},
 	}
-}
-
-func getRepoPath() (string, error) {
-	// Set default base path and directory name
-	path := "~"
-	directoryName := "spvwallet"
-
-	// Override OS-specific names
-	switch runtime.GOOS {
-	case "linux":
-		directoryName = ".spvwallet"
-	case "darwin":
-		path = "~/Library/Application Support"
-	}
-
-	// Join the path and directory name, then expand the home path
-	fullPath, err := homedir.Expand(filepath.Join(path, directoryName))
-	if err != nil {
-		return "", err
-	}
-
-	// Return the shortest lexical representation of the path
-	return filepath.Clean(fullPath), nil
 }

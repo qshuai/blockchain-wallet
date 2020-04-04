@@ -14,6 +14,7 @@ import (
 	"github.com/btcsuite/btcd/connmgr"
 	"github.com/btcsuite/btcd/peer"
 	"github.com/btcsuite/btcd/wire"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/proxy"
 )
 
@@ -209,11 +210,11 @@ func (pm *PeerManager) onVerack(p *peer.Peer, msg *wire.MsgVerAck) {
 		p.NA().HasService(SFNodeBitcoinCash) { // Don't connect to bitcoin cash nodes
 		// onDisconnection will be called
 		// which will remove the peer from openPeers
-		log.Warningf("Peer %s does not support bloom filtering, diconnecting", p)
+		logrus.Warningf("Peer %s does not support bloom filtering, diconnecting", p)
 		p.Disconnect()
 		return
 	}
-	log.Debugf("Connected to %s - %s\n", p.Addr(), p.UserAgent())
+	logrus.Debugf("Connected to %s - %s\n", p.Addr(), p.UserAgent())
 	// Tell the addr manager this is a good address
 	pm.addrManager.Good(p.NA())
 	if pm.msgChan != nil {
@@ -229,7 +230,7 @@ func (pm *PeerManager) onDisconnection(req *connmgr.ConnReq) {
 	if !ok {
 		return
 	}
-	log.Debugf("Peer %s disconnected", peer)
+	logrus.Debugf("Peer %s disconnected", peer)
 	delete(pm.connectedPeers, req.ID())
 	if pm.msgChan != nil {
 		pm.msgChan <- donePeerMsg{peer}
@@ -315,7 +316,7 @@ func (pm *PeerManager) queryDNSSeeds() {
 				pm.addrManager.AddAddress(netAddr, pm.sourceAddr)
 				returnedAddresses++
 			}
-			log.Debugf("%s returned %s addresses\n", host, strconv.Itoa(returnedAddresses))
+			logrus.Debugf("%s returned %s addresses\n", host, strconv.Itoa(returnedAddresses))
 			wg.Done()
 		}(seed.Host)
 	}
@@ -328,7 +329,7 @@ func (pm *PeerManager) getMoreAddresses() {
 		pm.peerMutex.RLock()
 		defer pm.peerMutex.RUnlock()
 		if len(pm.connectedPeers) > 0 {
-			log.Debug("Querying peers for more addresses")
+			logrus.Debug("Querying peers for more addresses")
 			for _, p := range pm.connectedPeers {
 				p.QueueMessage(wire.NewMsgGetAddr(), nil)
 			}
@@ -367,14 +368,14 @@ func (pm *PeerManager) onTx(p *peer.Peer, msg *wire.MsgTx) {
 }
 
 func (pm *PeerManager) onReject(p *peer.Peer, msg *wire.MsgReject) {
-	log.Warningf("Received reject message from peer %d: Code: %s, Hash %s, Reason: %s", int(p.ID()), msg.Code.String(), msg.Hash.String(), msg.Reason)
+	logrus.Warningf("Received reject message from peer %d: Code: %s, Hash %s, Reason: %s", int(p.ID()), msg.Code.String(), msg.Hash.String(), msg.Reason)
 }
 
 func (pm *PeerManager) Start() {
 	pm.addrManager.Start()
-	log.Infof("Loaded %d peers from cache\n", pm.addrManager.NumAddresses())
+	logrus.Infof("Loaded %d peers from cache\n", pm.addrManager.NumAddresses())
 	if pm.trustedPeer == nil && pm.addrManager.NeedMoreAddresses() {
-		log.Info("Querying DNS seeds")
+		logrus.Info("Querying DNS seeds")
 		pm.queryDNSSeeds()
 	}
 	pm.connManager.Start()

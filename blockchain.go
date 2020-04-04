@@ -14,6 +14,7 @@ import (
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
+	log "github.com/sirupsen/logrus"
 )
 
 // Blockchain settings.  These are kindof Bitcoin specific, but not contained in

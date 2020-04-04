@@ -23,13 +23,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-func SetupCli(parser *flags.Parser) {
+func SetupCli(parser *flags.Parser) error {
 	// Add commands to parser
-	parser.AddCommand("stop",
+	_, err := parser.AddCommand("stop",
 		"stop the wallet",
 		"The stop command disconnects from peers and shuts down the wallet",
 		&stop)
-	parser.AddCommand("currentaddress",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("currentaddress",
 		"get the current bitcoin address",
 		"Returns the first unused address in the keychain\n\n"+
 			"Args:\n"+
@@ -40,7 +44,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet currentaddress internal\n"+
 			"18zAxgfKx4NuTUGUEuB8p7FKgCYPM15DfS\n",
 		&currentAddress)
-	parser.AddCommand("newaddress",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("newaddress",
 		"get a new bitcoin address",
 		"Returns a new unused address in the keychain. Use caution when using this function as generating too many new addresses may cause the keychain to extend further than the wallet's lookahead window, meaning it might fail to recover all transactions when restoring from seed. CurrentAddress is safer as it never extends past the lookahead window.\n\n"+
 			"Args:\n"+
@@ -51,41 +59,77 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet newaddress internal\n"+
 			"18zAxgfKx4NuTUGUEuB8p7FKgCYPM15DfS\n",
 		&newAddress)
-	parser.AddCommand("chaintip",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("chaintip",
 		"return the height of the chain",
 		"Returns the height of the best chain of headers",
 		&chainTip)
-	parser.AddCommand("dumpheaders",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("dumpheaders",
 		"print the header database",
 		"Prints the header database to stdout."+
 			"Args:\n"+
 			"1. Path (string) Optional path to the header file\n",
 		&dumpheaders)
-	parser.AddCommand("balance",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("balance",
 		"get the wallet balance",
 		"Returns both the confirmed and unconfirmed balances",
 		&balance)
-	parser.AddCommand("masterprivatekey",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("masterprivatekey",
 		"get the wallet's master private key",
 		"Returns the bip32 master private key",
 		&masterPrivateKey)
-	parser.AddCommand("masterpublickey",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("masterpublickey",
 		"get the wallet's master public key",
 		"Returns the bip32 master public key",
 		&masterPublicKey)
-	parser.AddCommand("getkey",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("getkey",
 		"get a private key",
 		"Return the private key for the given address",
 		&getKey)
-	parser.AddCommand("listaddresses",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("listaddresses",
 		"list all addresses",
 		"Returns all addresses currently watched by the wallet",
 		&listAddresses)
-	parser.AddCommand("listkeys",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("listkeys",
 		"list all private keys",
 		"Returns all private keys currently watched by the wallet",
 		&listKeys)
-	parser.AddCommand("haskey",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("haskey",
 		"does key exist",
 		"Returns whether a key for the given address exists in the wallet\n\n"+
 			"Args:\n"+
@@ -94,11 +138,19 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet haskey 1DxGWC22a46VPEjq8YKoeVXSLzB7BA8sJS\n"+
 			"true\n",
 		&hasKey)
-	parser.AddCommand("transactions",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("transactions",
 		"get a list of transactions",
 		"Returns a json list of the wallet's transactions",
 		&transactions)
-	parser.AddCommand("gettransaction",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("gettransaction",
 		"get a specific transaction",
 		"Returns json data of a specific transaction\n\n"+
 			"Args:\n"+
@@ -106,7 +158,11 @@ func SetupCli(parser *flags.Parser) {
 			"Examples:\n"+
 			"> spvwallet gettransaction 190bd83935740b88ebdfe724485f36ca4aa40125a21b93c410e0e191d4e9e0b5\n",
 		&getTransaction)
-	parser.AddCommand("getfeeperbyte",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("getfeeperbyte",
 		"get the current bitcoin fee",
 		"Returns the current network fee per byte for the given fee level.\n\n"+
 			"Args:\n"+
@@ -117,7 +173,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet getfeeperbyte priority\n"+
 			"160\n",
 		&getFeePerByte)
-	parser.AddCommand("spend",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("spend",
 		"send bitcoins",
 		"Send bitcoins to the given address\n\n"+
 			"Args:\n"+
@@ -130,7 +190,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet spend 1DxGWC22a46VPEjq8YKoeVXSLzB7BA8sJS 3000000000 priority\n"+
 			"82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c",
 		&spend)
-	parser.AddCommand("bumpfee",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("bumpfee",
 		"bump the tx fee",
 		"Bumps the fee on an unconfirmed transaction\n\n"+
 			"Args:\n"+
@@ -139,11 +203,19 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet bumpfee 190bd83935740b88ebdfe724485f36ca4aa40125a21b93c410e0e191d4e9e0b5\n"+
 			"82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c",
 		&bumpFee)
-	parser.AddCommand("peers",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("peers",
 		"get info about peers",
 		"Returns a list of json data on each connected peer",
 		&peers)
-	parser.AddCommand("addwatchedscript",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("addwatchedscript",
 		"add a script to watch",
 		"Add a script of bitcoin address to watch\n\n"+
 			"Args:\n"+
@@ -152,7 +224,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet addwatchedscript 1DxGWC22a46VPEjq8YKoeVXSLzB7BA8sJS\n"+
 			"> spvwallet addwatchedscript 76a914f318374559bf8296228e9c7480578a357081d59988ac\n",
 		&addWatchedAddress)
-	parser.AddCommand("getconfirmations",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("getconfirmations",
 		"get the number of confirmations for a tx",
 		"Returns the number of confirmations for the given transaction\n\n"+
 			"Args:\n"+
@@ -161,7 +237,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet getconfirmations 190bd83935740b88ebdfe724485f36ca4aa40125a21b93c410e0e191d4e9e0b5\n"+
 			"6\n",
 		&getConfirmations)
-	parser.AddCommand("sweepaddress",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("sweepaddress",
 		"sweep all coins from an address",
 		"Completely empty an address into a different one\n\n"+
 			"Args:\n"+
@@ -189,7 +269,11 @@ func SetupCli(parser *flags.Parser) {
 			`> spvwallet sweepaddress "{"utxos":["txid": "82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c", "index": 0, "value": 1000000], "key": "be93c7096dc03bd495894140ff7fee894fbf6c944980d26f8f1cb12cc54316c7"}"`+"\n"+
 			"12c56cfcdc0249002c2a4b1f7fd957c7149fc45d0e9920594c7c78c17dcc34bd",
 		&sweepAddress)
-	parser.AddCommand("resyncblockchain",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("resyncblockchain",
 		"re-download the chain of headers",
 		"Will download all headers from the given height. Try this to uncover missing transasctions\n\n"+
 			"Args:\n"+
@@ -198,7 +282,11 @@ func SetupCli(parser *flags.Parser) {
 			"> spvwallet resyncblockchain 2017-10-06T16:00:17Z\n"+
 			"> spvwallet resyncblockchain",
 		&reSyncBlockchain)
-	parser.AddCommand("createmultisigsignature",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("createmultisigsignature",
 		"create a p2sh multisig signature",
 		"Create a signature for a p2sh multisig transaction\n\n"+
 			"Args:\n"+
@@ -228,7 +316,11 @@ func SetupCli(parser *flags.Parser) {
 			`> spvwallet createmultisigsignature "{"inputs":["txid": "82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c", "index": 0], "outputs":["scriptPubKey": "76a914f318374559bf8296228e9c7480578a357081d59988ac", "value": 1000000], "key": "xprvA2nrNbFZABcdryreWet9Ea4LvTJcGsqrMzxHx98MMrotbir7yrKCEXw7nadnHM8Dq38EGfSh6dqA9QWTyefMLEcBYJUuekgW4BYPJcr9E7j", "redeemScript": "1f6eb0660aab25ffe35978e7cb6e31bf40e1cceaf29c7f4f118cd2d76c2088237cb33c75510b8be669d90c01b0c394477690ff9c8388bcec4d71c3855fa50beb", "feePerByte": 140}"`+"\n"+
 			`[{"inputIndex": 0, "signature": "d76206ff0df8ab2c4121bae90c71d9b3a432e8f9c0cc90f66f61dec782bc82983a08c93cd9c660f412ba082f95b11f561276782dfbf4376ff4ca6b2f4ab7b3b0d8ba8b724b0237933a"}]`+"\n\n",
 		&createMultisigSignature)
-	parser.AddCommand("multisign",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("multisign",
 		"combine multisig signatures",
 		"Create a signed 2 of 3 p2sh transaction from two signatures and optionally broadcast\n\n"+
 			"Args:\n"+
@@ -268,7 +360,11 @@ func SetupCli(parser *flags.Parser) {
 			`> spvwallet multisign "{"inputs":["txid": "82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c", "index": 0], "outputs":["scriptPubKey": "76a914f318374559bf8296228e9c7480578a357081d59988ac", "value": 1000000], "sig1": [{"inputIndex": 0, "signature": "d76206ff0df8ab2c4121bae90c71d9b3a432e8f9c0cc90f66f61dec782bc82983a08c93cd9c660f412ba082f95b11f561276782dfbf4376ff4ca6b2f4ab7b3b0d8ba8b724b0237933a"}], "sig2": [{"inputIndex": 0, "signature": "766c36dea732e9640868155b79703545b6ef129bb0446f9b86ac7cad775229ef41ac95543bf488ed42c5b82ffc14d7248136e988b1d4c0ea6d56712de139f83815e8974306d267a900"}], "redeemScript": "1f6eb0660aab25ffe35978e7cb6e31bf40e1cceaf29c7f4f118cd2d76c2088237cb33c75510b8be669d90c01b0c394477690ff9c8388bcec4d71c3855fa50beb", "feePerByte": 140, "broadcast": false}"`+"\n"+
 			`010000000100357d084478aa6beba8ca59de331e9bd725d23c3eaf7de0e5167801582a585f040000006b483045022100897aba7833d46a519c1f46694e053be8fdeae32125acd764c54c97ac6856d6f802201ff0e693055e39b16151b4da2a61f8dbb3948c08107b68a4b484dc7359de5b350121026a9dc92c93988750560fb46885fe549251c664e63545889367f5db183637f966ffffffff02a4857902000000001976a9143f2fe0d76898ef6c23b2b2a2892d763e0602bc4288acbd8b7349000000001976a914cc61ffeae5c6673caaaff5c0b06af395c8edc9ad88ac00000000`+"\n\n",
 		&multisign)
-	parser.AddCommand("estimatefee",
+	if err != nil {
+		return err
+	}
+
+	_, err = parser.AddCommand("estimatefee",
 		"estimate the fee for a tx",
 		"Given a transaction estimate what fee it will cost in satoshis\n\n"+
 			"Args:\n"+
@@ -292,6 +388,8 @@ func SetupCli(parser *flags.Parser) {
 			`> spvwallet estimatefee "{"inputs":["txid": "82bfd45f3564e0b5166ab9ca072200a237f78499576e9658b20b0ccd10ff325c", "index": 0], "outputs":["scriptPubKey": "76a914f318374559bf8296228e9c7480578a357081d59988ac", "value": 1000000], "feePerByte": 140}"`+"\n"+
 			"18500\n",
 		&estimateFee)
+
+	return err
 }
 
 func newGRPCClient() (pb.APIClient, *grpc.ClientConn, error) {

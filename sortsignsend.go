@@ -23,6 +23,7 @@ import (
 	"github.com/btcsuite/btcutil/txsort"
 	"github.com/btcsuite/btcwallet/wallet/txauthor"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
+	log "github.com/sirupsen/logrus"
 )
 
 func (s *SPVWallet) Broadcast(tx *wire.MsgTx) error {
