@@ -7,8 +7,6 @@ import (
 	"net"
 	"sync"
 
-	"github.com/OpenBazaar/spvwallet"
-	"github.com/OpenBazaar/spvwallet/api/pb"
 	"github.com/OpenBazaar/wallet-interface"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
@@ -16,6 +14,8 @@ import (
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/qshuai/blockchain-wallet"
+	"github.com/qshuai/blockchain-wallet/api/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

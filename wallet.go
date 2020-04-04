@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenBazaar/spvwallet/exchangerates"
 	"github.com/OpenBazaar/wallet-interface"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -19,6 +18,7 @@ import (
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
 	"github.com/op/go-logging"
+	"github.com/qshuai/blockchain-wallet/exchangerates"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -57,7 +57,7 @@ var _ = wallet.Wallet(&SPVWallet{})
 
 var log = logging.MustGetLogger("bitcoin")
 
-const WALLET_VERSION = "0.1.0"
+const WalletVersion = "0.1.0"
 
 func NewSPVWallet(config *Config) (*SPVWallet, error) {
 
@@ -148,7 +148,7 @@ func NewSPVWallet(config *Config) (*SPVWallet, error) {
 
 	w.config = &PeerManagerConfig{
 		UserAgentName:    config.UserAgent,
-		UserAgentVersion: WALLET_VERSION,
+		UserAgentVersion: WalletVersion,
 		Params:           w.params,
 		AddressCacheDir:  config.RepoPath,
 		Proxy:            config.Proxy,

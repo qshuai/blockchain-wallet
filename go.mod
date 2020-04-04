@@ -4,7 +4,6 @@ go 1.13
 
 require (
 	github.com/OpenBazaar/jsonpb v0.0.0-20171123000858-37d32ddf4eef
-	github.com/OpenBazaar/spvwallet v0.0.0-20200112224336-39f04e8d6d34
 	github.com/OpenBazaar/wallet-interface v0.0.0-20191220170011-ba95db86ca2f
 	github.com/asticode/go-astilectron v0.9.3
 	github.com/asticode/go-astilog v1.4.0
@@ -18,6 +17,7 @@ require (
 	github.com/btcsuite/goleveldb v1.0.0
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73
 	github.com/fatih/color v1.9.0
+	github.com/go-errors/errors v1.0.1
 	github.com/golang/protobuf v1.3.5
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/julienschmidt/httprouter v1.3.0

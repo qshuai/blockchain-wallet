@@ -3,9 +3,9 @@ package bootstrap
 import (
 	"net/http"
 
-	"github.com/OpenBazaar/spvwallet"
 	"github.com/asticode/go-astilectron"
 	"github.com/julienschmidt/httprouter"
+	spvwallet "github.com/qshuai/blockchain-wallet"
 )
 
 // Options represents options

@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/OpenBazaar/spvwallet.svg?branch=master)](https://travis-ci.org/OpenBazaar/spvwallet)
 [![Coverage Status](https://coveralls.io/repos/github/OpenBazaar/spvwallet/badge.svg?branch=master)](https://coveralls.io/github/OpenBazaar/spvwallet?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/OpenBazaar/spvwallet)](https://goreportcard.com/report/github.com/OpenBazaar/spvwallet)
+[![Go Report Card](https://goreportcard.com/badge/github.com/qshuai/blockchain-wallet)](https://goreportcard.com/report/github.com/qshuai/blockchain-wallet)
 
 # spvwallet
 

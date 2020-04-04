@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"path"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/boltdb/bolt"

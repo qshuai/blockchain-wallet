@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/OpenBazaar/jsonpb"
-	"github.com/OpenBazaar/spvwallet"
-	"github.com/OpenBazaar/spvwallet/api"
-	"github.com/OpenBazaar/spvwallet/api/pb"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/jessevdk/go-flags"
+	spvwallet "github.com/qshuai/blockchain-wallet"
+	"github.com/qshuai/blockchain-wallet/api"
+	"github.com/qshuai/blockchain-wallet/api/pb"
 	"google.golang.org/grpc"
 )
 

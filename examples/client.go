@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/OpenBazaar/spvwallet"
-	"github.com/OpenBazaar/spvwallet/db"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/op/go-logging"
+	spvwallet "github.com/qshuai/blockchain-wallet"
+	"github.com/qshuai/blockchain-wallet/db"
 )
 
 func main() {
