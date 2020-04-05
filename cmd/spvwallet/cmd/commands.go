@@ -916,7 +916,7 @@ func ListTransaction(command *cobra.Command, args []string) {
 		Height        int32     `json:"height"`
 		WatchOnly     bool      `json:"watchOnly"`
 	}
-	var txns []Tx
+	txns := make([]Tx, 0, len(resp.Transactions))
 	for _, tx := range resp.Transactions {
 		var confirmations int32
 		var status string
